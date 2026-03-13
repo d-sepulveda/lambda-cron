@@ -1,4 +1,4 @@
-name: Deploy Blossom Webhooks
+name: Deploy Lambda Cron
 on:
   push:
     branches:
@@ -20,11 +20,8 @@ jobs:
         with:
           node-version: 24
 
-      - name: install dependencies
-        run: yarn install
-
-      - name: Install global dependencies
-        run: sudo yarn global add serverless
+      - name: Install dependencies
+        run: npm ci
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -34,9 +31,10 @@ jobs:
 
       - name: Deploy with Serverless Framework
         env:
+          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
           REGION: ${{ vars.REGION }}
           STAGE: ${{ vars.STAGE }}
-        run: sls deploy --force
+        run: npx serverless deploy --force
 
   deploy-prod-job:
     runs-on: ubuntu-latest
@@ -46,19 +44,14 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 24
 
-      - name: install dependencies
-        run: yarn install
-
-      - name: Install global dependencies
-        run: sudo yarn global add serverless
+      - name: Install dependencies
+        run: npm ci
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -68,6 +61,7 @@ jobs:
 
       - name: Deploy with Serverless Framework
         env:
+          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
           REGION: ${{ vars.REGION }}
           STAGE: ${{ vars.STAGE }}
-        run: sls deploy --force
+        run: npx serverless deploy --force
