@@ -8,16 +8,14 @@ provider:
   memorySize: 128
   timeout: 30
 
-plugins:
-  - serverless-esbuild
-
-custom:
+build:
   esbuild:
     bundle: true
     minify: false
     sourcemap: true
-    target: node24
-    platform: node
+
+plugins:
+  - serverless-offline
 
 functions:
   cronJob:
@@ -27,3 +25,6 @@ functions:
       - schedule:
           rate: rate(1 hour)
           enabled: true
+      - http:
+          path: /cron
+          method: get
