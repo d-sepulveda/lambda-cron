@@ -2,20 +2,21 @@ service: lambda-cron
 
 provider:
   name: aws
-  runtime: nodejs24.x
+  runtime: nodejs20.x
   region: ${env:REGION, 'us-east-1'}
   stage: ${env:STAGE, 'dev'}
   memorySize: 128
   timeout: 30
 
-build:
+plugins:
+  - serverless-esbuild
+  - serverless-offline
+
+custom:
   esbuild:
     bundle: true
     minify: false
     sourcemap: true
-
-plugins:
-  - serverless-offline
 
 functions:
   everyMinute:

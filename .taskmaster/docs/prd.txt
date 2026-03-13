@@ -1,0 +1,87 @@
+# Lambda-Cron Spike - Documentation PRD
+
+## Project Overview
+This project is a spike/proof-of-concept for the company demonstrating how to create scheduled AWS Lambda functions (cron jobs) and HTTP-triggered Lambdas using Serverless Framework v4, TypeScript, Node.js 24, and EventBridge/CloudWatch Events, with automated CI/CD via GitHub Actions using OIDC authentication.
+
+## Task 1: Create Comprehensive Spike Documentation (Notion-style)
+
+Create a detailed, step-by-step documentation guide (Notion-style) that enables any developer to replicate this Lambda-cron project from scratch. The documentation must cover ALL of the following sections:
+
+### 1. Project Overview & Tech Stack
+- What the project does: scheduled Lambda functions (crons) + HTTP endpoints
+- Technologies: AWS Lambda, EventBridge/CloudWatch Events, Serverless Framework v4, TypeScript, Node.js 24, esbuild (native in SFv4), serverless-offline
+- Architecture: each Lambda in src/lambdas/<name>/handler.ts
+
+### 2. Prerequisites
+- AWS account with IAM access
+- Node.js 24 installed
+- npm as package manager
+- Serverless Framework Dashboard account (app.serverless.com) - required for v4
+- GitHub repository
+
+### 3. Project Initialization
+- npm init, package.json setup
+- Install dependencies: serverless v4, serverless-offline v14, typescript, esbuild
+- Folder structure: src/lambdas/everyMinute/handler.ts, src/lambdas/daily/handler.ts, src/lambdas/manual/handler.ts
+- tsconfig.json configuration
+- .gitignore (node_modules, dist, .esbuild, .serverless)
+
+### 4. serverless.yml Configuration
+- Provider: AWS, nodejs24.x, region, stage from env vars
+- Build: esbuild native (Serverless v4 built-in, no plugin needed)
+- Plugins: serverless-offline only
+- Functions with schedule events (rate syntax and cron syntax)
+- Functions with HTTP events (API Gateway)
+- Note: serverless-esbuild plugin is NOT needed in v4 (conflicts with native build)
+
+### 5. AWS IAM Configuration (CRITICAL - Full Detail)
+- Step-by-step: Create OIDC Identity Provider for GitHub Actions in AWS IAM
+- Create IAM Role (lambda_permision) with trust policy for GitHub OIDC
+- Full JSON of trust policy for GitHub OIDC provider
+- Required permissions policies with COMPLETE JSON:
+  - Lambda: full access for function management
+  - CloudFormation: full access for stack management
+  - S3: access for deployment bucket
+  - IAM: CreateRole, PutRolePolicy, PassRole, DeleteRole, DeleteRolePolicy, GetRole
+  - CloudWatch Logs: full access
+  - CloudWatch Events / EventBridge: full access for schedules
+  - API Gateway: full access for HTTP endpoints
+  - SSM Parameter Store: GetParameter, PutParameter, DeleteParameter on /serverless-framework/* (NEW in Serverless v4)
+- Inline policy creation step-by-step in AWS Console
+
+### 6. GitHub Actions CI/CD Configuration
+- Workflow file: .github/workflows/deploy.yml
+- Two jobs: deploy-development (branch: development) and deploy-prod (branch: master)
+- GitHub Environments: development, prod
+- Required SECRETS in GitHub Actions:
+  - AWS_ROLE_ARN: the IAM role ARN for OIDC
+  - SERVERLESS_ACCESS_KEY: from Serverless Dashboard (app.serverless.com > Settings > Access Keys)
+- Required VARIABLES in GitHub Actions:
+  - REGION: us-east-1
+  - STAGE: dev / prod
+- Step-by-step: how to create secrets and variables in GitHub repo settings
+- Complete workflow YAML with npm ci, aws-actions/configure-aws-credentials, npx serverless deploy
+
+### 7. Local Development
+- npm run dev (runs serverless offline)
+- HTTP endpoints available at localhost:3000/dev/<path>
+- Cron schedules execute automatically in serverless-offline v14
+- Manual invocation: npx serverless invoke local -f <functionName>
+
+### 8. Deployment & Monitoring
+- Automatic deploy on push to development/master branches
+- CloudWatch Logs: /aws/lambda/lambda-cron-<stage>-<functionName>
+- How to check logs in AWS Console
+
+### 9. Troubleshooting
+- Error: "You must sign in or use a license key" → SERVERLESS_ACCESS_KEY required in v4
+- Error: "ssm:GetParameter not authorized" → Add SSM permissions to IAM role
+- Error: "unsupported runtime" → nodejs24.x not recognized by older Serverless versions
+- Error: "conflicts with serverless-esbuild plugin" → Remove plugin, use native build in v4
+- Warning: url.parse() deprecated → cosmetic, does not affect functionality
+
+### 10. .env File Structure
+- AWS_ROLE_ARN
+- SERVERLESS_ACCESS_KEY
+- REGION
+- STAGE
