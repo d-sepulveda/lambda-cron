@@ -2,7 +2,7 @@ service: lambda-cron
 
 provider:
   name: aws
-  runtime: nodejs20.x
+  runtime: nodejs24.x
   region: ${env:REGION, 'us-east-1'}
   stage: ${env:STAGE, 'dev'}
   memorySize: 128
@@ -16,7 +16,7 @@ custom:
     bundle: true
     minify: false
     sourcemap: true
-    target: node20
+    target: node24
     platform: node
 
 functions:
