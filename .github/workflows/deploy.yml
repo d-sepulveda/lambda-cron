@@ -1,0 +1,73 @@
+name: Deploy Blossom Webhooks
+on:
+  push:
+    branches:
+      - development
+      - master
+
+jobs:
+  deploy-development-job:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/development'
+    environment: development
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: install dependencies
+        run: yarn install
+
+      - name: Install global dependencies
+        run: sudo yarn global add serverless
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.REGION }}
+
+      - name: Deploy with Serverless Framework
+        env:
+          REGION: ${{ vars.REGION }}
+          STAGE: ${{ vars.STAGE }}
+        run: sls deploy --force
+
+  deploy-prod-job:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    environment: prod
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: install dependencies
+        run: yarn install
+
+      - name: Install global dependencies
+        run: sudo yarn global add serverless
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.REGION }}
+
+      - name: Deploy with Serverless Framework
+        env:
+          REGION: ${{ vars.REGION }}
+          STAGE: ${{ vars.STAGE }}
+        run: sls deploy --force

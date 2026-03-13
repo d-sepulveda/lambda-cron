@@ -1,0 +1,29 @@
+service: lambda-cron
+
+provider:
+  name: aws
+  runtime: nodejs24.x
+  region: ${env:REGION, 'us-east-1'}
+  stage: ${env:STAGE, 'dev'}
+  memorySize: 128
+  timeout: 30
+
+plugins:
+  - serverless-esbuild
+
+custom:
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: true
+    target: node24
+    platform: node
+
+functions:
+  cronJob:
+    handler: src/index.handler
+    description: Scheduled Lambda cron job
+    events:
+      - schedule:
+          rate: rate(1 hour)
+          enabled: true

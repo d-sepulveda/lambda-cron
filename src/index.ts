@@ -1,5 +1,3 @@
-export async function handler(): Promise<void> {
-  console.log("Lambda Cron started");
+export async function handler(event: unknown): Promise<void> {
+  console.log("Lambda Cron executed", JSON.stringify(event));
 }
-
-handler();
