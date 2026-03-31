@@ -30,7 +30,7 @@ jobs:
           aws-region: ${{ vars.REGION }}
 
       - name: CDK Bootstrap
-        run: npx cdk bootstrap aws://${{ secrets.AWS_ACCOUNT_ID }}/${{ vars.REGION }}
+        run: npx cdk bootstrap
 
       - name: Deploy with CDK
         run: npx cdk deploy --require-approval never
@@ -59,7 +59,7 @@ jobs:
           aws-region: ${{ vars.REGION }}
 
       - name: CDK Bootstrap
-        run: npx cdk bootstrap aws://${{ secrets.AWS_ACCOUNT_ID }}/${{ vars.REGION }}
+        run: npx cdk bootstrap
 
       - name: Deploy with CDK
         run: npx cdk deploy --require-approval never
