@@ -18,7 +18,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Install dependencies
         run: npm ci
@@ -29,11 +29,11 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ vars.REGION }}
 
-      - name: Deploy with Serverless Framework
-        env:
-          REGION: ${{ vars.REGION }}
-          STAGE: ${{ vars.STAGE }}
-        run: npx serverless deploy --force
+      - name: CDK Bootstrap
+        run: npx cdk bootstrap aws://${{ secrets.AWS_ACCOUNT_ID }}/${{ vars.REGION }}
+
+      - name: Deploy with CDK
+        run: npx cdk deploy --require-approval never
 
   deploy-prod-job:
     runs-on: ubuntu-latest
@@ -47,7 +47,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Install dependencies
         run: npm ci
@@ -58,8 +58,8 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ vars.REGION }}
 
-      - name: Deploy with Serverless Framework
-        env:
-          REGION: ${{ vars.REGION }}
-          STAGE: ${{ vars.STAGE }}
-        run: npx serverless deploy --force
+      - name: CDK Bootstrap
+        run: npx cdk bootstrap aws://${{ secrets.AWS_ACCOUNT_ID }}/${{ vars.REGION }}
+
+      - name: Deploy with CDK
+        run: npx cdk deploy --require-approval never

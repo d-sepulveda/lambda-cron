@@ -11,8 +11,7 @@ node_modules/
 
 # Build output
 dist/
-.esbuild/
-.serverless/
+cdk.out/
 
 # Environment variables
 .env
