@@ -18,7 +18,7 @@ export class LambdaCronStack extends cdk.Stack {
     const { stage } = props;
 
     const commonLambdaProps = {
-      runtime: lambda.Runtime.NODEJS_22_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       memorySize: 128,
       timeout: cdk.Duration.seconds(30),
       bundling: {
